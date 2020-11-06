@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">My Day</string>
+    <string name="title_news">News</string>
+    <string name="title_weather">Weather</string>
+    <string name="title_todo">ToDo List</string>
+
+</resources>
