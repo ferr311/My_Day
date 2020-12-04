@@ -7,7 +7,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.shukhaev.mydaytest.R
 import com.shukhaev.mydaytest.news.adapter.NewsAdapter
-import com.shukhaev.mydaytest.util.toast
 import jp.wasabeef.recyclerview.animators.FlipInTopXAnimator
 import kotlinx.android.synthetic.main.fragment_news.*
 
@@ -44,13 +43,16 @@ class NewsListFragment : Fragment(R.layout.fragment_news) {
     }
 
     private fun navigateToNewsDetail(position: Int) {
-        val url = newsAdapter?.items?.get(position)?.url
-        if (url == null) {
-            toast("No link to this news")
-        } else {
-            val action = NewsListFragmentDirections.actionNavigationNewsToFragmentNewsDetail(url)
-            findNavController().navigate(action)
-        }
+        val imageUrl = newsAdapter?.items?.get(position)?.image
+        val content = newsAdapter?.items?.get(position)?.content
+
+        val action =
+            imageUrl?.let { content?.let { it1 ->
+                NewsListFragmentDirections.actionNavigationNewsToFragmentNewsDetail(it,
+                    it1
+                )
+            } }
+        action?.let { findNavController().navigate(it) }
 
     }
 

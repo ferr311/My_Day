@@ -13,11 +13,12 @@ class NewsAdapter(onItemClicked: (position: Int) -> Unit) :
 
     class NewsDiffUtil : DiffUtil.ItemCallback<News>() {
         override fun areItemsTheSame(oldItem: News, newItem: News): Boolean {
-            return when {
-                oldItem is News && newItem is News -> oldItem.id == newItem.id
-
-                else -> false
-            }
+//            return when {
+//                oldItem is News && newItem is News -> oldItem.id == newItem.id
+//
+//                else -> false
+//            }
+            return true
         }
 
         override fun areContentsTheSame(oldItem: News, newItem: News): Boolean {

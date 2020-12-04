@@ -5,6 +5,7 @@ import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.shukhaev.mydaytest.R
+import com.shukhaev.mydaytest.util.loadImage
 import kotlinx.android.synthetic.main.fragment_news_detail.*
 
 class NewsDetailFragment : Fragment(R.layout.fragment_news_detail) {
@@ -14,12 +15,7 @@ class NewsDetailFragment : Fragment(R.layout.fragment_news_detail) {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-
-        news_detail_webView.apply {
-            loadUrl(args.url)
-            settings.javaScriptEnabled = true
-            webViewClient = WebViewClient()
-        }
+        loadImage(args.imageUrl, news_detail_iv)
+        news_detail_tv.text = args.content
     }
-
 }

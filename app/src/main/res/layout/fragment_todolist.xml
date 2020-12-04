@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".todolist.ui.ToDoListFragment">
+    tools:context=".todolist.ui.TasksListFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/todo_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/item_list_news_card" />
+        tools:listitem="@layout/item_list_todo_card" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/todo_fab_add"

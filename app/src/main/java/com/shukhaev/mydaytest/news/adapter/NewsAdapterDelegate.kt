@@ -9,7 +9,7 @@ import com.shukhaev.mydaytest.R
 import com.shukhaev.mydaytest.news.model.News
 import com.shukhaev.mydaytest.util.loadImage
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_list_news.*
+import kotlinx.android.synthetic.main.item_list_news_card.*
 
 class NewsAdapterDelegate(
     private val onItemClicked: (position: Int) -> Unit
@@ -41,7 +41,7 @@ class NewsAdapterDelegate(
 
         fun bind(news: News) {
             news_item_tv_title.text = news.title
-            news_item_tv_description.text = news.description
+//            news_item_tv_description.text = news.description
             loadImage(news.image, news_item_iv_image)
 
         }

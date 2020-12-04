@@ -23,15 +23,27 @@
 
     <fragment
         android:id="@+id/navigation_todolist"
-        android:name="com.shukhaev.mydaytest.todolist.ui.ToDoListFragment"
+        android:name="com.shukhaev.mydaytest.todolist.ui.TasksListFragment"
         android:label="@string/title_todo"
-        tools:layout="@layout/fragment_todolist" />
+        tools:layout="@layout/fragment_todolist" >
+        <action
+            android:id="@+id/action_navigation_todolist_to_addTaskFragment"
+            app:destination="@id/addTaskFragment" />
+    </fragment>
     <fragment
         android:id="@+id/fragmentNewsDetail"
         android:name="com.shukhaev.mydaytest.news.ui.NewsDetailFragment"
-        android:label="FragmentNewsDetail" >
+        android:label="News" >
         <argument
-            android:name="url"
+            android:name="imageUrl"
             app:argType="string" />
+        <argument
+            android:name="content"
+            app:argType="string"/>
     </fragment>
+    <fragment
+        android:id="@+id/addTaskFragment"
+        android:name="com.shukhaev.mydaytest.todolist.ui.AddTaskFragment"
+        android:label="Task"
+        tools:layout="@layout/fragment_add_edit_task" />
 </navigation>

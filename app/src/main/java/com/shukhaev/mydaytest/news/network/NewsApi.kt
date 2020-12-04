@@ -7,10 +7,15 @@ import retrofit2.http.Query
 
 interface NewsApi {
 
-    @GET("v1/latest-news")
+    //cb5338dd82d54b91922e55aeb89401d4
+    //kSZWKZ7Zwjv7T9_I5Cglq1QHWWx7jOCAHPEG8PFR2BJxIjDS
+
+//    @GET("v1/latest-news")
+    @GET("v2/top-headlines")
     suspend fun getLatestNews(
-        @Query("apiKey") apiKey: String = "kSZWKZ7Zwjv7T9_I5Cglq1QHWWx7jOCAHPEG8PFR2BJxIjDS",
-        @Query("language") language: String = "en"
+        @Query("apiKey") apiKey: String = "cb5338dd82d54b91922e55aeb89401d4",
+        //@Query("language") language: String = "en"
+        @Query("country") country: String = "ru"
     ): Response<NewsResponse>
 
 }
