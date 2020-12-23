@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -19,6 +20,7 @@ import com.shukhaev.mydaytest.databinding.FragmentTodolistBinding
 import com.shukhaev.mydaytest.todolist.adapters.TaskAdapter
 import com.shukhaev.mydaytest.todolist.model.SortOrder
 import com.shukhaev.mydaytest.todolist.model.Task
+import com.shukhaev.mydaytest.util.exhaustive
 import com.shukhaev.mydaytest.util.onQueryTextChanged
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
@@ -31,6 +33,7 @@ class TasksListFragment : Fragment(R.layout.fragment_todolist), TaskAdapter.OnIt
     private val tasksListViewModel: TasksListViewModel by viewModels()
     private lateinit var binding: FragmentTodolistBinding
     private val taskAdapter: TaskAdapter = TaskAdapter(this)
+    private lateinit var searchView:SearchView
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -38,7 +41,8 @@ class TasksListFragment : Fragment(R.layout.fragment_todolist), TaskAdapter.OnIt
         setHasOptionsMenu(true)
 
         binding = FragmentTodolistBinding.bind(view)
-        binding.todoFabAdd.setOnClickListener { navigateToAddFragment() }
+        binding.todoFabAdd.setOnClickListener { tasksListViewModel.onAddNewTaskClick() }
+
         initRecyclerView()
         observeViewModel()
 
@@ -51,8 +55,37 @@ class TasksListFragment : Fragment(R.layout.fragment_todolist), TaskAdapter.OnIt
                                 tasksListViewModel.onUndoDeleteClick(event.task)
                             }.show()
                     }
-                }
+                    is TasksListViewModel.TaskEvent.NavigateToAddTaskScreen -> {
+                        val action =
+                            TasksListFragmentDirections.actionNavigationTodolistToAddTaskFragment(
+                                null,
+                                "New Task"
+                            )
+                        findNavController().navigate(action)
+                    }
+                    is TasksListViewModel.TaskEvent.NavigateToEditTaskScreen -> {
+                        val action =
+                            TasksListFragmentDirections.actionNavigationTodolistToAddTaskFragment(
+                                event.task,
+                                "Edit Task"
+                            )
+                        findNavController().navigate(action)
+                    }
+                    is TasksListViewModel.TaskEvent.ShowTaskSavedMessage -> {
+                        Snackbar.make(requireView(), event.msg, Snackbar.LENGTH_SHORT).show()
+                    }
+                    is TasksListViewModel.TaskEvent.NavigateToDeleteAllCompletedScreen -> {
+                        val action =
+                            TasksListFragmentDirections.actionGlobalDeleteAllCompletedDialogFragment()
+                        findNavController().navigate(action)
+                    }
+                }.exhaustive
             }
+        }
+
+        setFragmentResultListener("add_edit_request") { _, bundle ->
+            val result = bundle.getInt("add_edit_result")
+            tasksListViewModel.onAddEditResult(result)
         }
     }
 
@@ -67,7 +100,14 @@ class TasksListFragment : Fragment(R.layout.fragment_todolist), TaskAdapter.OnIt
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.todo_list_menu, menu)
         val searchItem = menu.findItem(R.id.todo_list_search)
-        val searchView = searchItem.actionView as SearchView
+        searchView = searchItem.actionView as SearchView
+
+        val pendingQuery = tasksListViewModel.searchQuery.value
+        if (pendingQuery != null && pendingQuery.isNotEmpty()){
+            searchItem.expandActionView()
+            searchView.setQuery(pendingQuery,false)
+        }
+
         searchView.onQueryTextChanged {
             tasksListViewModel.searchQuery.value = it
         }
@@ -95,7 +135,7 @@ class TasksListFragment : Fragment(R.layout.fragment_todolist), TaskAdapter.OnIt
                 true
             }
             R.id.todo_list_delete_all_completed -> {
-
+                tasksListViewModel.onDeleteAllCompletedClick()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -133,8 +173,9 @@ class TasksListFragment : Fragment(R.layout.fragment_todolist), TaskAdapter.OnIt
         }
     }
 
-    private fun navigateToAddFragment() {
-        findNavController().navigate(R.id.action_navigation_todolist_to_addTaskFragment)
+    override fun onDestroy() {
+        super.onDestroy()
+        searchView.setOnQueryTextListener(null)
     }
 
 }

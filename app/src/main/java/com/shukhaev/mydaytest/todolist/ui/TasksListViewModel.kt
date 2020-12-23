@@ -1,9 +1,10 @@
 package com.shukhaev.mydaytest.todolist.ui
 
+import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.shukhaev.mydaytest.ADD_TASK_RESULT_OK
+import com.shukhaev.mydaytest.EDIT_TASK_RESULT_OK
 import com.shukhaev.mydaytest.todolist.model.PreferencesManager
 import com.shukhaev.mydaytest.todolist.model.SortOrder
 import com.shukhaev.mydaytest.todolist.model.Task
@@ -14,18 +15,19 @@ import kotlinx.coroutines.launch
 
 class TasksListViewModel @ViewModelInject constructor(
     private val taskDao: TaskDao,
-    private val preferencesManager: PreferencesManager
+    private val preferencesManager: PreferencesManager,
+    @Assisted private val state: SavedStateHandle
 ) : ViewModel() {
 
-    val searchQuery = MutableStateFlow("")
+    val searchQuery = state.getLiveData("searchQuery", "")
 
     val preferencesFlow = preferencesManager.preferencesFlow
 
     private val taskEventChannel = Channel<TaskEvent>()
-        val taskEvent = taskEventChannel.receiveAsFlow()
+    val taskEvent = taskEventChannel.receiveAsFlow()
 
     private val taskFlow = combine(
-        searchQuery,
+        searchQuery.asFlow(),
         preferencesFlow
     ) { query, filterPreferences ->
         Pair(query, filterPreferences)
@@ -44,7 +46,7 @@ class TasksListViewModel @ViewModelInject constructor(
     }
 
     fun onTaskSelected(task: Task) = viewModelScope.launch {
-
+        taskEventChannel.send(TaskEvent.NavigateToEditTaskScreen(task))
     }
 
     fun onTaskCheckChanged(task: Task, isChecked: Boolean) = viewModelScope.launch {
@@ -60,8 +62,31 @@ class TasksListViewModel @ViewModelInject constructor(
         taskDao.insert(task)
     }
 
+    fun onAddNewTaskClick() = viewModelScope.launch {
+        taskEventChannel.send(TaskEvent.NavigateToAddTaskScreen)
+    }
+
+    fun onAddEditResult(result: Int) {
+        when (result) {
+            ADD_TASK_RESULT_OK -> showTaskSavedMessage("Task added")
+            EDIT_TASK_RESULT_OK -> showTaskSavedMessage("Task updated")
+        }
+    }
+
+    private fun showTaskSavedMessage(msg: String) = viewModelScope.launch {
+        taskEventChannel.send(TaskEvent.ShowTaskSavedMessage(msg))
+    }
+
+    fun onDeleteAllCompletedClick() = viewModelScope.launch {
+        taskEventChannel.send(TaskEvent.NavigateToDeleteAllCompletedScreen)
+    }
+
     sealed class TaskEvent {
+        object NavigateToAddTaskScreen : TaskEvent()
+        data class NavigateToEditTaskScreen(val task: Task) : TaskEvent()
         data class ShowUndoDeleteTaskMessage(val task: Task) : TaskEvent()
+        data class ShowTaskSavedMessage(val msg: String) : TaskEvent()
+        object NavigateToDeleteAllCompletedScreen : TaskEvent()
     }
 
 }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp"
-    tools:context=".todolist.ui.AddTaskFragment">
+    tools:context=".todolist.ui.addedittask.AddEditTaskFragment">
 
     <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/add_todo_input"
@@ -39,7 +39,7 @@
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/add_todo_fab_add"
+        android:id="@+id/add_todo_fab_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"

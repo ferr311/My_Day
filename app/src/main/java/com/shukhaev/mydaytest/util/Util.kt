@@ -7,6 +7,9 @@ import com.bumptech.glide.Glide
 
 lateinit var APP_ACTIVITY: Activity
 
+val <T> T.exhaustive:T
+    get() = this
+
 fun loadImage(url: String?, view: ImageView) {
     Glide.with(APP_ACTIVITY)
         .load(url)
